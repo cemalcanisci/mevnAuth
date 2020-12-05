@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const path = require("path");
 const cors = require("cors");
-
+const passport = require("passport");
 //Initialize the app
 
 const app = express();
@@ -15,12 +15,21 @@ app.use(
     extended: false,
   })
 );
+
 //Json Body Middleware
 app.use(bodyParser.json());
+
 //Cors Middleware
 app.use(cors());
+
 //Setting up the static directory
 app.use(express.static(path.join(__dirname, "public")));
+
+//User the passport Middleware
+app.use(passport.initialize());
+
+//Bring in the Passport Strategy
+require("./config/passport")(passport);
 
 //Bring in the Database Config and connect with the database
 const db = require("./config/keys").mongoURI;
@@ -29,7 +38,6 @@ mongoose.connect(
   { useNewUrlParser: true, useUnifiedTopology: true },
   (err) => {
     if (err) {
-      console.log(`Unable to connect with the database ${err}`);
     } else {
       console.log(`Database connected successfully ${db}`);
     }
@@ -39,6 +47,9 @@ mongoose.connect(
 // app.get("/", (req, res) => {
 //   return res.send("<h1>Hello World1</h1>");
 // });
+//Bring in the Users route
+const users = require("./routes/api/users");
+app.use("/api/users", users);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
