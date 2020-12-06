@@ -88,6 +88,7 @@ router.post("/login", (req, res) => {
         jwt.sign(payload, key, { expiresIn: 604800 }, (err, token) => {
           res.status(200).json({
             success: true,
+            user,
             token: `Bearer ${token}`,
             msg: "Hurry! You are now logged in",
           });
